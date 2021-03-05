@@ -7,5 +7,6 @@ app_name = 'core'
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('product/<slug>/', ItemDetailView.as_view(), name='product'),
-    path('checkout/', checkout, name='checkout'), 
+    path('checkout/', checkout, name='checkout'),
+    path('add_to_cart/<slug>/', add_to_cart, name='add_to_cart'),
 ]
