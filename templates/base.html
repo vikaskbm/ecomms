@@ -51,9 +51,9 @@
 
 {% include "navbar.html" %}
 
-<body class="mt-5 pt-3">
+<body class="mt-5 pt-4">
     {% if messages %}
-      <div class="mt-5 pt-4">
+      <div>
         {% for message in messages %}
         <div class="alert alert-dismissible fade show alert-{{message.tags}}" role="alert" data-mdb-color="{{message.tags}}">
           {{ message }}

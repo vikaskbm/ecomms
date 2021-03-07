@@ -9,7 +9,7 @@
 {% load i18n %}
 {% load account socialaccount %}
 {% load crispy_forms_tags %}
-{% block head_title %}{% trans "Sign In" %}{% endblock %}
+{% block head_title %}{% trans "Checkout" %}{% endblock %}
 
 {% block content %}
 <main>
@@ -28,14 +28,49 @@
             </thead>
             <tbody>
                 {% for order_item in object.items.all %}
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>{{ order_item.item.title }}</td>
-                        <td>{{ order_item.item.price }}</td>
-                        <td>{{ order_item.quantity }}</td>
-                        <td>???</td>
-                    </tr>
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ order_item.item.title }}</td>
+                    <td>
+                        {% if order_item.item.discount_price %}
+                            {{ order_item.item.discount_price }}
+                        {% else %}
+                            {{ order_item.item.price }}
+                        {% endif %}
+                    </td>
+                    <td> 
+                        <a href="{% url 'core:remove_single_item_from_cart' order_item.item.slug %}"><i class="fas fa-minus mr-2"></i> </a>
+                        {{ order_item.quantity }} 
+                        <a><i class="fas fa-plus ml-2" ></i></td></a> 
+                    <td>
+                        {{ order_item.get_final_price }}
+                        {% if order_item.item.discount_price %}
+                            <span class="badge bg-primary">Saving ${{ order_item.get_amount_saved }}</span>
+                        {% endif %}
+                        <a class="fas fa-trash-alt float-right" style="color: red;"  ></a>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5">Your cart is empty
+                    <a href="/" class="btn btn-primary float-right mr-2">Continue Shopping</a>
+                    </td>
+                </tr>
                 {% endfor %}
+                {% if object.get_total %}
+                    <tr>
+                        <td colspan="4"><b>Total Price</b></td>
+                        <td><b>${{ object.get_total }}</b></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">
+                            <a href="/checkout/" class="btn btn-warning float-right">Proceed to Checkout</a>
+                            <a href="/" class="btn btn-primary float-right mr-2">Continue Shopping</a>
+                        </td>
+                    </tr>
+                {% endif %}
+                    
             </tbody>
         </table>
     </div>
