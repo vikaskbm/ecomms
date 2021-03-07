@@ -12,6 +12,11 @@
 <!-- Initializations -->
 <script type="text/javascript">
 // Animations initialization
-new WOW().init();
+  new WOW().init();
+  window.setTimeout(function() {
+      $(".alert").fadeTo(500, 0).slideUp(500, function(){
+          $(this).remove(); 
+      });
+  }, 500);
 
 </script>

@@ -83,7 +83,7 @@ def remove_from_cart(request, slug):
                 user=request.user,
                 ordered=False
             )[0]
-            order_item.quantity = 0
+            order_item.quantity = 1
             order_item.save()
             order.items.remove(order_item)
             messages.info(request, "This item was removed from your cart")
