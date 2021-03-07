@@ -71,6 +71,17 @@ class OrderItem(models.Model):
         return self.get_total_item_price()
 
 
+class BillingAddress(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    address_line_1 = models.CharField(max_length=100)
+    address_line_2 = models.CharField(max_length=100)
+    country = CountryField(multiple=False)
+    zip_code = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.user.username
+
+
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
@@ -78,6 +89,7 @@ class Order(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     order_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
+    billing_address = models.ForeignKey(BillingAddress, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -88,14 +100,3 @@ class Order(models.Model):
             total += item.get_final_price()
         
         return total
-
-
-class BillingAddress(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    address_line_1 = models.CharField(max_length=100)
-    address_line_2 = models.CharField(max_length=100)
-    country = CountryField(multiple=False)
-    zip_code = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.user.username
