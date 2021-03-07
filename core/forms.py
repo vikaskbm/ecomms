@@ -1,11 +1,12 @@
 from django import forms
 from django_countries.fields import CountryField
+from django_countries.widgets import CountrySelectWidget
+
 
 PAYMENT_CHOICES = (
     ('S', 'Stripe'),
     ('P', 'Paypal')
 )
-
 
 
 class CheckoutForm(forms.Form):
@@ -14,11 +15,17 @@ class CheckoutForm(forms.Form):
         "placeholder":"1234 Main St"
     }
     ))
-    address_line_2 = forms.CharField(required=False)
+    address_line_2 = forms.CharField(required=False, widget=forms.TextInput(attrs={
+        "class":"form-control", 
+        "placeholder":"Area/Locality"
+    }
+    ))
 
-    country = CountryField(blank_label='(select country)').formfield(attrs={
-        "class":"custom-select d-block w-100"
-    })
+    country = CountryField(blank_label='(select country)').formfield(
+        widget=CountrySelectWidget(attrs={
+            'class': "custom-select d-block w-100"
+        }))
+    
     zip_code = forms.CharField(widget=forms.TextInput(attrs={
         "class": "form-control",
     }))
@@ -26,5 +33,5 @@ class CheckoutForm(forms.Form):
     same_billing_address = forms.BooleanField(required=False)
     save_info = forms.BooleanField(required=False)
 
-    payment_option = forms.ChoiceField(widget=forms.RadioSelect, choices=PAYMENT_CHOICES)
-
+    payment_option = forms.ChoiceField(
+        widget=forms.RadioSelect, choices=PAYMENT_CHOICES)

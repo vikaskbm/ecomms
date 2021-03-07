@@ -45,10 +45,13 @@ class CheckOutView(View):
 
     def post(self, *args, **kwargs):
         form = CheckoutForm(self.request.POST or None)
+        print(self.request.POST)
         if form.is_valid():
-            print("Form is valid")
-            return redirect("core:checkout.html")
-
+            print(form.cleaned_data)
+            return redirect("core:checkout")
+        
+        messages.warning(self.request, "Failed to checkout ")
+        return redirect("core:checkout")        
 
 @login_required
 def add_to_cart(request, slug):
