@@ -39,15 +39,15 @@
                         {% endif %}
                     </td>
                     <td> 
-                        <a href="{% url 'core:remove_single_item_from_cart' order_item.item.slug %}"><i class="fas fa-minus mr-2"></i> </a>
+                        <a href="{% url 'core:remove_single_item_from_cart' order_item.item.slug %}" ><i class="fas fa-minus mr-2"></i> </a>
                         {{ order_item.quantity }} 
-                        <a><i class="fas fa-plus ml-2" ></i></td></a> 
+                        <a href="{% url 'core:add_to_cart' order_item.item.slug %}"><i class="fas fa-plus ml-2" ></i></td></a> 
                     <td>
                         {{ order_item.get_final_price }}
                         {% if order_item.item.discount_price %}
                             <span class="badge bg-primary">Saving ${{ order_item.get_amount_saved }}</span>
                         {% endif %}
-                        <a class="fas fa-trash-alt float-right" style="color: red;"  ></a>
+                        <a href="{% url 'core:remove_from_cart' order_item.item.slug %}" class="fas fa-trash-alt float-right" style="color: red;"  ></a>
                     </td>
                 </tr>
 
