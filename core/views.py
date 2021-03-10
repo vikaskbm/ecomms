@@ -99,15 +99,12 @@ class PaymentLandingView(TemplateView):
 
 class PaymentView(View): 
     def post(self, request, *args, **kwargs):
-        try:
-            print("HELLO")
-            order = Order.objects.get(user=self.request.user, ordered=False )
-            print("HELLO")
+        try: 
+            order = Order.objects.get(user=self.request.user, ordered=False ) 
             intent = stripe.PaymentIntent.create(
                 amount=100,
                 currency='usd' 
-            )
-            print("HELLO")
+            ) 
             print(intent['client_secret'])
             
             # order.ordered = True
@@ -115,8 +112,7 @@ class PaymentView(View):
                 "clientSecret": intent['client_secret']
             }) 
 
-        except Exception as e:
-            print("BYE")
+        except Exception as e: 
             return JsonResponse({ "error" :str(e) })
 
 
