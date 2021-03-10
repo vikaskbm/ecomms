@@ -101,7 +101,7 @@ class PaymentView(View):
     def post(self, request, *args, **kwargs):
         try:
             print("HELLO")
-            order = Order.objects.get(user=self.request.user, ordered=False, id=order_id)
+            order = Order.objects.get(user=self.request.user, ordered=False )
             print("HELLO")
             intent = stripe.PaymentIntent.create(
                 amount=100,
