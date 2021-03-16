@@ -2,6 +2,7 @@ env
 **/*.pyc
 **/__pycache__
 media
+static_root
 .DS_Store
 *.sqlite3
 *.env
