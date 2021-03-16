@@ -246,7 +246,7 @@ button:disabled {
   // A reference to Stripe.js initialized with your real test publishable API key.
 
   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; 
-  var stripe = Stripe("{{STRIPE_PUBLIC_KEY }}"); 
+  var stripe = Stripe("{{STRIPE_PUBLIC_KEY }}");  
   // Disable the button until we have Stripe set up on the page
   document.querySelector("button").disabled = true;
   fetch("{% url 'core:create_payment_intent' %}", {
@@ -290,6 +290,7 @@ button:disabled {
       });
 
       var form = document.getElementById("payment-form");
+      console.log(data.clientSecret)
       form.addEventListener("submit", function(event) {
         event.preventDefault();
         // Complete payment when the submit button is clicked

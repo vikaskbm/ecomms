@@ -107,20 +107,23 @@ class PaymentView(View):
     def post(self, request, *args, **kwargs): 
         try: 
             order = Order.objects.get(user=self.request.user, ordered=False ) 
-            amount = int(order.get_total() * 100)
-            
+            amount = int(order.get_total() * 100) 
             intent = stripe.PaymentIntent.create(
                 amount=amount,
                 currency='usd',
-                description=f'Payment for order {order}'
-            )  
-
+            )
             # create payment
             payment = Payment()
             payment.stripe_charge_id = intent.id
             payment.user = self.request.user
             payment.amount = order.get_total()
             payment.save()
+
+            # update order items
+            order_items = order.items.all()
+            order_items.update(ordered=True)
+            for item in order_items:
+                item.save()
 
             # assign payment to order
             # order.payment = payment
