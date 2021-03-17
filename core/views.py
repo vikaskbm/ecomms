@@ -233,14 +233,12 @@ def remove_single_item_from_cart(request, slug):
         messages.info(request, "You do not have an active order")
         return redirect('core:product', slug=slug) 
 
-def get_coupon(code):
+# def add_coupon(request, code):
+#     try:
+#         order_qs = Order.objects.get(user=request.user, ordered=False)
 
-def add_coupon(request, code):
-    try:
-        order_qs = Order.objects.get(user=request.user, ordered=False)
+#         coupon = Coupon.objects.get(code=code)
 
-        coupon = Coupon.objects.get(code=code)
-
-    except ObjectDoesNotExist:
-        messages.info(request, "You do not have an active order")
-        return redirect("core:checkout")
+#     except ObjectDoesNotExist:
+#         messages.info(request, "You do not have an active order")
+#         return redirect("core:checkout")
