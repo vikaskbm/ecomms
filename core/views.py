@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 import json
 
-from .models import Item, OrderItem, Order, BillingAddress, Payment
+from .models import Item, OrderItem, Order, BillingAddress, Payment, Coupon
 from .forms import CheckoutForm
 
 import stripe
@@ -232,3 +232,15 @@ def remove_single_item_from_cart(request, slug):
         # order does not exist
         messages.info(request, "You do not have an active order")
         return redirect('core:product', slug=slug) 
+
+def get_coupon(code):
+
+def add_coupon(request, code):
+    try:
+        order_qs = Order.objects.get(user=request.user, ordered=False)
+
+        coupon = Coupon.objects.get(code=code)
+
+    except ObjectDoesNotExist:
+        messages.info(request, "You do not have an active order")
+        return redirect("core:checkout")
