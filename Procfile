@@ -1,1 +1,1 @@
-web: gunicorn djangoherokuapp.wsgi --log-ecomms -
+web: gunicorn ecomms.wsgi
