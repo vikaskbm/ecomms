@@ -1,13 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import ListView, DetailView, TemplateView
+from django.views import View
+from django.conf import settings
 from django.utils import timezone
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+import json
 
-from .models import Item, OrderItem, Order, BillingAddress
+from .models import Item, OrderItem, Order, BillingAddress, Payment, Coupon
 from .forms import CheckoutForm
+
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class HomeView(ListView):
@@ -67,18 +75,67 @@ class CheckOutView(View):
                 order.billing_address = billing_address
                 order.save()
                 # TODO: add a redirect to selected payment option
-                return redirect("core:checkout")
+                if payment_option == 'S':
+                    return redirect("core:payment", payment_option="stripe")
+                elif payment_option == 'P':
+                    return redirect("core:payment", payment_option="paypal")
+                else:
+                    messages.warning(self.request, "Invalid paymemnt option selected")
+                    return redirect("core:checkout")
             
             messages.warning(self.request, "Failed to checkout ")
             return redirect("core:checkout")     
         except ObjectDoesNotExist:
             messages.error(self.request, "You do not have an active user")
-            return redirect("/")   
+            return redirect("core:order_summary")   
 
 
-class PaymentView(View):
-    def get(self, *args, **kwargs):
-        return render(self.request, 'payment.html')
+class PaymentLandingView(TemplateView):
+    template_name = 'payment.html'
+
+    def get_context_data(self, **kwargs):
+        order = Order.objects.get(user=self.request.user, ordered=False) 
+        context =  super(PaymentLandingView, self).get_context_data(**kwargs)
+        context.update({
+            "order": order,
+            "STRIPE_PUBLIC_KEY": settings.STRIPE_PUBLIC_KEY
+        })
+        return context
+
+
+class PaymentView(View): 
+    def post(self, request, *args, **kwargs): 
+        try: 
+            order = Order.objects.get(user=self.request.user, ordered=False ) 
+            amount = int(order.get_total() * 100) 
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency='usd',
+            )
+            # create payment
+            payment = Payment()
+            payment.stripe_charge_id = intent.id
+            payment.user = self.request.user
+            payment.amount = order.get_total()
+            payment.save()
+
+            # update order items
+            order_items = order.items.all()
+            order_items.update(ordered=True)
+            for item in order_items:
+                item.save()
+
+            # assign payment to order
+            # order.payment = payment
+            # order.ordered = True
+            # order.save()
+
+            return JsonResponse({
+                "clientSecret": intent['client_secret']
+            }) 
+
+        except Exception as e: 
+            return JsonResponse({ "error" :str(e) })
 
 
 
@@ -174,4 +231,14 @@ def remove_single_item_from_cart(request, slug):
     else:
         # order does not exist
         messages.info(request, "You do not have an active order")
-        return redirect('core:product', slug=slug)
+        return redirect('core:product', slug=slug) 
+
+# def add_coupon(request, code):
+#     try:
+#         order_qs = Order.objects.get(user=request.user, ordered=False)
+
+#         coupon = Coupon.objects.get(code=code)
+
+#     except ObjectDoesNotExist:
+#         messages.info(request, "You do not have an active order")
+#         return redirect("core:checkout")
